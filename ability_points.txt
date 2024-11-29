@@ -1,2 +1,2 @@
-AA Points Gained: 2
-Monsters Slain: 9
+AA Points Gained: 8
+Monsters Slain: 42
