@@ -1,2 +1,3 @@
-AA Points Gained: 8
-Monsters Slain: 42
+AA Points Gained: 2
+Monsters Slain: 30
+AA Points Per Hour: 36.75
