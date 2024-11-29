@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
     QCheckBox,
 )
 from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 import sys
 from datetime import datetime
 
@@ -64,6 +64,11 @@ class MonitorApp(QWidget):
         self.display_aa = True
         self.display_slain = True
         self.display_rate = True
+
+        # Timer for updating AA Points Per Hour
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_aa_rate)
+        self.timer_interval = 30000  # 30 seconds in milliseconds
 
         self.init_ui()
 
@@ -191,7 +196,6 @@ class MonitorApp(QWidget):
     def update_aa_counter(self):
         self.aa_count += 1
         self.aa_label.setText(f"AA Points Gained: {self.aa_count}")
-        self.update_aa_rate()
         self.write_to_file()
 
     def update_slain_counter(self):
@@ -206,12 +210,14 @@ class MonitorApp(QWidget):
         self.aa_label.setText(f"AA Points Gained: {self.aa_count}")
         self.slain_label.setText(f"Monsters Slain: {self.slain_count}")
         self.aa_rate_label.setText("AA Points Per Hour: 0.0")
+        self.timer.stop()
         self.write_to_file()
 
     def reset_aa_rate(self):
         self.start_time = datetime.now()
         self.aa_rate_label.setText("AA Points Per Hour: 0.0")
         self.status_label.setText("AA Points Per Hour Reset")
+        self.timer.start(self.timer_interval)  # Restart the timer
         self.write_to_file()
 
     def update_aa_rate(self):
@@ -243,6 +249,7 @@ class MonitorApp(QWidget):
             self.monitor = LogMonitor(self.log_file, self.update_aa_counter, self.update_slain_counter)
             self.monitor.start()
             self.start_time = datetime.now()
+            self.timer.start(self.timer_interval)  # Start periodic updates
             self.start_button.setEnabled(False)
             self.stop_button.setEnabled(True)
             self.status_label.setText("Monitoring Started!")
@@ -251,6 +258,7 @@ class MonitorApp(QWidget):
         if self.monitor:
             self.monitor.stop()
             self.monitor = None
+            self.timer.stop()  # Stop the periodic updates
             self.start_button.setEnabled(True)
             self.stop_button.setEnabled(False)
             self.status_label.setText("Monitoring Stopped!")
