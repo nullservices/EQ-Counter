@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
     QLabel,
     QWidget,
     QFileDialog,
+    QCheckBox,
 )
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
@@ -59,6 +60,11 @@ class MonitorApp(QWidget):
         self.start_time = None
         self.monitor = None
 
+        # Output toggles
+        self.display_aa = True
+        self.display_slain = True
+        self.display_rate = True
+
         self.init_ui()
 
     def init_ui(self):
@@ -66,78 +72,93 @@ class MonitorApp(QWidget):
 
         # Title
         self.title_label = QLabel("Ability Point & Monster Tracker")
-        self.title_label.setFont(QFont("Arial", 18, QFont.Bold))
+        self.title_label.setFont(QFont("Arial", 20, QFont.Bold))
         self.title_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.title_label, 0, 0, 1, 2)
 
         # AA Points Counter
         self.aa_label = QLabel(f"AA Points Gained: {self.aa_count}")
-        self.aa_label.setFont(QFont("Arial", 14, QFont.Bold))
+        self.aa_label.setFont(QFont("Arial", 16, QFont.Bold))
         self.aa_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.aa_label, 1, 0)
 
         # Monsters Slain Counter
         self.slain_label = QLabel(f"Monsters Slain: {self.slain_count}")
-        self.slain_label.setFont(QFont("Arial", 14, QFont.Bold))
+        self.slain_label.setFont(QFont("Arial", 16, QFont.Bold))
         self.slain_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.slain_label, 1, 1)
 
         # AA Points Per Hour Label
         self.aa_rate_label = QLabel("AA Points Per Hour: 0.0")
-        self.aa_rate_label.setFont(QFont("Arial", 14, QFont.Bold))
+        self.aa_rate_label.setFont(QFont("Arial", 16, QFont.Bold))
         self.aa_rate_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.aa_rate_label, 2, 0, 1, 2)
+
+        # Checkboxes for output toggles
+        self.aa_checkbox = QCheckBox("Display AA Points Gained")
+        self.aa_checkbox.setChecked(self.display_aa)
+        self.aa_checkbox.stateChanged.connect(self.update_output_toggles)
+        self.layout.addWidget(self.aa_checkbox, 3, 0, 1, 2)
+
+        self.slain_checkbox = QCheckBox("Display Monsters Slain")
+        self.slain_checkbox.setChecked(self.display_slain)
+        self.slain_checkbox.stateChanged.connect(self.update_output_toggles)
+        self.layout.addWidget(self.slain_checkbox, 4, 0, 1, 2)
+
+        self.rate_checkbox = QCheckBox("Display AA Points Per Hour")
+        self.rate_checkbox.setChecked(self.display_rate)
+        self.rate_checkbox.stateChanged.connect(self.update_output_toggles)
+        self.layout.addWidget(self.rate_checkbox, 5, 0, 1, 2)
 
         # Select Log File Button
         self.select_file_button = QPushButton("Select Log File")
         self.select_file_button.clicked.connect(self.select_log_file)
-        self.layout.addWidget(self.select_file_button, 3, 0, 1, 2)
+        self.layout.addWidget(self.select_file_button, 6, 0, 1, 2)
 
         # Start Monitoring Button
         self.start_button = QPushButton("Start Monitoring")
         self.start_button.clicked.connect(self.start_monitoring)
         self.start_button.setEnabled(False)
-        self.layout.addWidget(self.start_button, 4, 0)
+        self.layout.addWidget(self.start_button, 7, 0)
 
         # Stop Monitoring Button
         self.stop_button = QPushButton("Stop Monitoring")
         self.stop_button.clicked.connect(self.stop_monitoring)
         self.stop_button.setEnabled(False)
-        self.layout.addWidget(self.stop_button, 4, 1)
+        self.layout.addWidget(self.stop_button, 7, 1)
 
         # Reset Counts Button
         self.reset_button = QPushButton("Reset Counts")
         self.reset_button.clicked.connect(self.reset_counts)
-        self.layout.addWidget(self.reset_button, 5, 0, 1, 2)
+        self.layout.addWidget(self.reset_button, 8, 0, 1, 2)
 
         # Reset AA Per Hour Button
         self.reset_rate_button = QPushButton("Reset AA Per Hour")
         self.reset_rate_button.clicked.connect(self.reset_aa_rate)
-        self.layout.addWidget(self.reset_rate_button, 6, 0, 1, 2)
+        self.layout.addWidget(self.reset_rate_button, 9, 0, 1, 2)
 
         # Status Label
         self.status_label = QLabel("Select a log file to start.")
-        self.status_label.setFont(QFont("Arial", 10))
+        self.status_label.setFont(QFont("Arial", 12))
         self.status_label.setAlignment(Qt.AlignCenter)
-        self.layout.addWidget(self.status_label, 7, 0, 1, 2)
+        self.layout.addWidget(self.status_label, 10, 0, 1, 2)
 
         self.setLayout(self.layout)
 
-        # Apply styling
+        # Apply sleek modern styling
         self.setStyleSheet(
             """
             QWidget {
-                background-color: #2E2E2E;
-                color: #E0E0E0;
+                background-color: #1E1E1E;
+                color: #E8E8E8;
             }
             QLabel {
-                color: #E0E0E0;
+                color: #E8E8E8;
             }
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
-                border: none;
-                padding: 8px 16px;
+                padding: 10px 20px;
                 border-radius: 5px;
                 font-size: 14px;
             }
@@ -147,11 +168,15 @@ class MonitorApp(QWidget):
             QPushButton:hover {
                 background-color: #45A049;
             }
+            QCheckBox {
+                color: #E8E8E8;
+                font-size: 14px;
+            }
             """
         )
 
         self.setWindowTitle("Ability Point & Monster Tracker")
-        self.resize(400, 300)
+        self.resize(500, 500)
         self.show()
 
     def select_log_file(self):
@@ -196,13 +221,22 @@ class MonitorApp(QWidget):
         rate = self.aa_count / elapsed_time if elapsed_time > 0 else 0
         self.aa_rate_label.setText(f"AA Points Per Hour: {rate:.2f}")
 
+    def update_output_toggles(self):
+        self.display_aa = self.aa_checkbox.isChecked()
+        self.display_slain = self.slain_checkbox.isChecked()
+        self.display_rate = self.rate_checkbox.isChecked()
+        self.write_to_file()
+
     def write_to_file(self):
         with open("ability_points.txt", "w") as f:
-            f.write(f"AA Points Gained: {self.aa_count}\n")
-            f.write(f"Monsters Slain: {self.slain_count}\n")
-            elapsed_time = (datetime.now() - self.start_time).total_seconds() / 3600 if self.start_time else 0
-            rate = self.aa_count / elapsed_time if elapsed_time > 0 else 0
-            f.write(f"AA Points Per Hour: {rate:.2f}")
+            if self.display_aa:
+                f.write(f"AA Points Gained: {self.aa_count}\n")
+            if self.display_slain:
+                f.write(f"Monsters Slain: {self.slain_count}\n")
+            if self.display_rate:
+                elapsed_time = (datetime.now() - self.start_time).total_seconds() / 3600 if self.start_time else 0
+                rate = self.aa_count / elapsed_time if elapsed_time > 0 else 0
+                f.write(f"AA Points Per Hour: {rate:.2f}\n")
 
     def start_monitoring(self):
         if self.log_file and not self.monitor:
