@@ -2,7 +2,7 @@
 
 A sleek and modern application for monitoring **Ability Points Gained** and **Monsters Slain** from your game logs in real time. Perfect for streamers who want to display this information on their streams or players who want to keep track of their progress.
 
-![GUI Preview](https://github.com/nullservices/EQ-Counter/blob/main/gui-preview.png)
+![GUI Preview](https://raw.githubusercontent.com/nullservices/EQ-Counter/refs/heads/main/gui-preview.png)
 
 ![OBS Preview](https://github.com/nullservices/EQ-Counter/blob/main/obs-display.png)
 
